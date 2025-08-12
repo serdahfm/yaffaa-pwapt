@@ -1,0 +1,155 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>YAFA‑MS Runner</title>
+  <style>
+    :root { color-scheme: dark light; }
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif;
+      padding: 24px; max-width: 900px; margin: auto; line-height: 1.4; color: #111;
+    }
+    h1 { margin: 0 0 8px 0; font-size: 22px; }
+    .sub { color: #666; margin-bottom: 16px; }
+    textarea { width: 100%; box-sizing: border-box; }
+    .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+    .row > * { margin: 4px 0; }
+    label { font-size: 13px; color: #333; }
+    input[type="text"], select, textarea { padding: 8px 10px; border: 1px solid #ccc; border-radius: 8px; background: #fff; }
+    .btn { padding: 10px 14px; border: 1px solid #bbb; border-radius: 10px; background: #111; color: #fff; cursor: pointer; }
+    .btn.secondary { background: #fff; color: #111; }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .stack { display: grid; gap: 10px; }
+    .out { margin-top: 18px; padding: 14px; border: 1px solid #ddd; border-radius: 10px; background: #fafafa; white-space: pre-wrap; word-break: break-word; font-family: ui-sans-serif, system-ui, sans-serif; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; background: #0b1220; color: #dbecff; }
+    .note { font-size: 12px; color: #666; }
+    .footer { margin-top: 20px; font-size: 12px; color: #666; }
+  </style>
+</head>
+<body>
+  <h1>YAFA‑MS</h1>
+  <div class="sub">Single-box runner. Option A: copy a monolith prompt. Option B: run via your local n8n webhook.</div>
+
+  <div class="stack">
+    <div>
+      <label>What’s the mission?</label>
+      <textarea id="mission" rows="8" placeholder="Describe your goal in one paragraph..."></textarea>
+    </div>
+
+    <div class="row">
+      <div>
+        <label>Mode</label><br>
+        <select id="mode">
+          <option>Standard</option>
+          <option>Brainstorm</option>
+        </select>
+      </div>
+      <div>
+        <label>YAFA</label><br>
+        <select id="yafa">
+          <option>Off</option>
+          <option>On</option>
+        </select>
+      </div>
+      <div>
+        <label>Dial</label><br>
+        <select id="dial">
+          <option>Plan+Drafts</option>
+          <option>Full Exec</option>
+        </select>
+      </div>
+      <div style="flex:1 1 280px; min-width: 220px;">
+        <label>Webhook Endpoint</label><br>
+        <input id="endpoint" type="text" value="http://localhost:5678/webhook/yafa"/>
+      </div>
+    </div>
+
+    <div class="row">
+      <button id="run" class="btn">Run via n8n</button>
+      <button id="copy" class="btn secondary">Copy Monolith Prompt</button>
+      <span id="status" class="note"></span>
+    </div>
+
+    <div id="output" class="out" style="display:none"></div>
+    <div id="raw" class="out mono" style="display:none"></div>
+  </div>
+
+  <div class="footer note">
+    Tip: If your browser blocks the request, serve this file via a local server: `python3 -m http.server 8000` and open http://localhost:8000/form.html.
+  </div>
+
+  <script>
+  // Compact YAFA‑MS system directive (you can paste the full text from yafa_ms_prompt.txt if desired)
+  const SYSTEM_PROMPT = `INITIALIZE THE YAFA‑MS PROTOCOL\n\nROLE\nYou are YAFA‑MS, an interactive business environment for non‑technical users (import/export focus). Operate as a world‑class execution partner. No assumptions. Ask‑Once. Push back on weak premises. Guarantee usable deliverables.\n\nMODES\n- Standard: Plan & Drafts or Full Execution, with PREVIEW prose + FILE_CONTENT files.\n- YAFA (High‑stakes overlay): Strong pushback; risk/compliance checks; simulations; readiness gate (withhold FILE_CONTENT if violations).\n- Brainstorm: Divergent→Convergent. Explore angles, then narrow via a question ladder.\n\nOUTPUT CONTRACT (STRICT)\n- JSON_HEADER FIRST (fenced).\n- ARTIFACTS per deliverable: PREVIEW (prose; no fences/no CLI) then FILE_CONTENT (fenced with name=, path=, type=, from=).\n- BINARY TARGETS: Slides as markdown; Sheets CSV; Docs MD/HTML.\n\nPOLICIES\n- PASS 0 — INTAKE (one‑shot) with INTAKE_FORM JSON; VALUE/FOR_NOW/N/A; N/A prunes; Missing→BLOCKER.\n- PRUNE CONTRACT; PREMISE GRILL; EQUIVALENCE; BACKWARDS PLANNER; CRITIC (fail‑stop).\n- YAFA overlay adds risk/compliance/simulations; readiness gate; CLI only inside FILE_CONTENT.\n- UNCERTAINTY with A/B and deciding variable.\n- EXPORTER: JSON_HEADER first; then per deliverable PREVIEW (prose) + FILE_CONTENT (fenced). Include INSPECTION_TARGETS + VERIFICATION_CMDs.\n\nCONSTRAINTS\n- No assumptions; PREVIEW prose only; no CLI unless yafa=true; exact filenames/mime in FILE_CONTENT; today’s date; single response.`;
+
+  function buildUserMessage(mission, mode, yafa, dial) {
+    return `INPUT\nMISSION: ${mission}\nMODE: ${mode}\nYAFA: ${yafa}\nDIAL: ${dial}`;
+  }
+
+  async function runViaWebhook() {
+    const mission = document.getElementById('mission').value.trim();
+    const mode = document.getElementById('mode').value;
+    const yafa = document.getElementById('yafa').value;
+    const dial = document.getElementById('dial').value;
+    const endpoint = document.getElementById('endpoint').value.trim();
+    const status = document.getElementById('status');
+    const out = document.getElementById('output');
+    const raw = document.getElementById('raw');
+    if (!mission) { alert('Please enter a mission.'); return; }
+    status.textContent = 'Running...';
+    out.style.display = 'none'; raw.style.display = 'none';
+    document.getElementById('run').disabled = true;
+    try {
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mission, mode, yafa, dial })
+      });
+      const text = await res.text();
+      // Show raw first; simple extraction of PREVIEW if present
+      raw.style.display = 'block';
+      raw.textContent = text;
+      const preview = extractPreview(text);
+      if (preview) {
+        out.style.display = 'block';
+        out.textContent = preview;
+      }
+      status.textContent = res.ok ? 'Done' : `HTTP ${res.status}`;
+    } catch (err) {
+      status.textContent = 'Failed';
+      alert('Request failed. If opened via file://, start a local server (python3 -m http.server 8000) and open http://localhost:8000/form.html. Also ensure n8n is running on port 5678.');
+    } finally {
+      document.getElementById('run').disabled = false;
+    }
+  }
+
+  function extractPreview(text) {
+    // Heuristic: PREVIEW is the first prose block between JSON_HEADER fence and first FILE_CONTENT fence
+    // If not found, return empty
+    const fileFence = /```[\s\S]*?name=.*?FILE_CONTENT[\s\S]*?```/m;
+    const headerFence = /```json\s+name=JSON_HEADER[\s\S]*?```/m;
+    const afterHeader = text.split(headerFence)[1] || '';
+    if (!afterHeader) return '';
+    const previewOnly = afterHeader.split(fileFence)[0] || '';
+    // Remove stray fences if any
+    return previewOnly.trim();
+  }
+
+  async function copyMonolith() {
+    const mission = document.getElementById('mission').value.trim();
+    const mode = document.getElementById('mode').value;
+    const yafa = document.getElementById('yafa').value;
+    const dial = document.getElementById('dial').value;
+    if (!mission) { alert('Please enter a mission.'); return; }
+    const userMsg = buildUserMessage(mission, mode, yafa, dial);
+    const monolith = `${SYSTEM_PROMPT}\n\n${userMsg}`;
+    await navigator.clipboard.writeText(monolith);
+    document.getElementById('status').textContent = 'Monolith copied. Paste into your LLM.';
+  }
+
+  document.getElementById('run').addEventListener('click', (e) => { e.preventDefault(); runViaWebhook(); });
+  document.getElementById('copy').addEventListener('click', (e) => { e.preventDefault(); copyMonolith(); });
+  </script>
+</body>
+</html>

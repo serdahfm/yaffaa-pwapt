@@ -1,0 +1,165 @@
+{
+  "name": "YAFA-MS Form Runner (Starter)",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "yafa",
+        "httpMethod": "POST",
+        "responseMode": "lastNode",
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "id": "Webhook",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        280,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "const body = items[0].json || {};\nconst mode = String(body.mode || 'Standard');\nconst yafa = String(body.yafa || 'Off');\nconst dial = String(body.dial || 'Plan+Drafts');\nconst mission = String(body.mission || '').trim();\n\n// Minimal embedded YAFA-MS system directive (short form to avoid import issues).\n// For full protocol, replace with contents of yafa_ms_prompt.txt after import.\nconst system = [\n  'INITIALIZE THE YAFA-MS PROTOCOL',\n  'ROLE: World-class execution partner. No assumptions. Ask-Once. Push back. Guarantee usable deliverables.',\n  'MODES: Standard | YAFA overlay | Brainstorm.',\n  'OUTPUT: 1) JSON_HEADER (fenced json, first). 2) For each deliverable: PREVIEW (prose, no fences/no CLI) then FILE_CONTENT (fenced with name=, path=, type=, from=).',\n  'POLICIES: One-shot INTAKE with VALUE/FOR_NOW/N/A. PRUNE missing. PREMISE GRILL. EQUIVALENCE. CRITIC fail-stop. UNCERTAINTY A/B if confidence<85%.',\n  'BINARY TARGETS: Slides as markdown; Sheets CSV; Docs MD/HTML.',\n  'CONSTRAINTS: Single response; today\'s date; precise mime/path; no CLI unless yafa=true.'\n].join('\n');\n\nconst user = `INPUT\\nMISSION: ${mission}\\nMODE: ${mode}\\nYAFA: ${yafa}\\nDIAL: ${dial}`;\n\nreturn [{ json: { system, user } }];"
+      },
+      "id": "Build Messages",
+      "name": "Build Messages",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        560,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "resource": "chat",
+        "operation": "create",
+        "model": "gpt-4o-mini",
+        "messages": {
+          "chatMessage": [
+            {
+              "role": "system",
+              "content": "={{$json.system}}"
+            },
+            {
+              "role": "user",
+              "content": "={{$json.user}}"
+            }
+          ]
+        }
+      },
+      "id": "OpenAI Chat",
+      "name": "OpenAI Chat",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 3,
+      "position": [
+        840,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Build Messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Messages": {
+      "main": [
+        [
+          {
+            "node": "OpenAI Chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "id": "YAFA-MS-Form-Runner-Starter"
+}
+
+{
+  "name": "YAFA-MS",
+  "nodes": [
+    {
+      "parameters": {"path": "yafa", "responseMode": "lastNode"},
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [200, 200]
+    },
+    {
+      "parameters": {
+        "functionCode": "const { mission, mode, yafa, dial } = $json;\nreturn [{ input: `INPUT\\nMISSION: ${mission||''}\\nMODE: ${mode||'Standard'}\\nYAFA: ${yafa||'Off'}\\nDIAL: ${dial||'Plan+Drafts'}` }];"
+      },
+      "name": "Build Input",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 2,
+      "position": [480, 200]
+    },
+    {
+      "parameters": {
+        "resource": "chat",
+        "model": "gpt-4o",
+        "systemMessage": "={{$binary? $binary.prompt : ''}}",
+        "chatMessage": "={{$json.input}}"
+      },
+      "name": "LLM Chat (OpenAI)",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 4,
+      "position": [760, 200]
+    },
+    {
+      "parameters": {
+        "functionCode": "const txt = $json.text || $json.data?.[0]?.text || $json.choices?.[0]?.message?.content || $json.content || '';\nfunction extractHeader(s){ const m = s.match(/```json\\s+name=JSON_HEADER[\\s\\S]*?```/); if(!m) return null; const body = m[0].replace(/```json\\s+name=JSON_HEADER/,'').replace(/```/g,'').trim(); try{ return JSON.parse(body); }catch(e){ return null;} }\nfunction extractFiles(s){ const re = /```text\\s+name=([A-Za-z0-9_\.-]+)\\s+path=([^\\s]+)\\s+type=([^\\s]+)[\\s\\S]*?```/g; const out=[]; let m; while((m=re.exec(s))){ const body=m[0].replace(/```text[\\s\\S]*?\n/,'').replace(/```$/,''); out.push({ name:m[1], path:m[2], type:m[3], content: body }); } return out;}\nconst header = extractHeader(txt); const files = extractFiles(txt);\nreturn [{ header, files, raw: txt }];"
+      },
+      "name": "Parse Output",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 2,
+      "position": [1040, 200]
+    },
+    {
+      "parameters": {
+        "operation": "add",
+        "binaryPropertyName": "bundle",
+        "dataPropertyName": "files",
+        "fileNameProperty": "path",
+        "mimeTypeProperty": "type",
+        "fileContentProperty": "content"
+      },
+      "name": "Archive (zip)",
+      "type": "n8n-nodes-base.archive",
+      "typeVersion": 1,
+      "position": [1320, 200]
+    },
+    {
+      "parameters": {
+        "responseBody": "={{$json.header}}",
+        "responseHeaders": {"Content-Type": "application/json"}
+      },
+      "name": "HTTP Response",
+      "type": "n8n-nodes-base.httpResponse",
+      "typeVersion": 1,
+      "position": [1600, 200]
+    }
+  ],
+  "connections": {
+    "Webhook": {"main": [[{"node": "Build Input", "type": "main", "index": 0}]]},
+    "Build Input": {"main": [[{"node": "LLM Chat (OpenAI)", "type": "main", "index": 0}]]},
+    "LLM Chat (OpenAI)": {"main": [[{"node": "Parse Output", "type": "main", "index": 0}]]},
+    "Parse Output": {"main": [[{"node": "Archive (zip)", "type": "main", "index": 0}, {"node": "HTTP Response", "type": "main", "index": 0}]]}
+  }
+}

@@ -1,0 +1,17 @@
+EXECUTE FORGE - PHASE 1: BLUEPRINT
+
+You will operate under the YAFA‑MS protocol (see CONTRACT in yafa_ms_prompt.txt). In this phase, you MUST produce:
+- JSON_HEADER (first, fenced) and PREVIEW prose ONLY.
+- DO NOT emit any FILE_CONTENT blocks in Phase 1.
+
+INPUT
+MISSION: <paste mission>
+MODE: <Standard|Brainstorm>
+YAFA: <On|Off>
+DIAL: <Plan+Drafts|Full Exec>
+
+Phase‑specific rules
+- Build the plan and draft PREVIEWs for each deliverable.
+- Enforce Ask‑Once intake, pruning, pushback, equivalence, and critic.
+- PREVIEW must be human‑readable text (no code fences, no CLI). Save file specs for Phase 2.
+- End with a short "AEGIS READY" line to signal the validation phase can start.

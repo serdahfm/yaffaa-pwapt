@@ -1,0 +1,21 @@
+EXECUTE FORGE - PHASE 2: AEGIS VALIDATION
+
+You will now subject your previous output to the full Aegis Test protocol. Use the YAFA‑MS contract.
+
+Previous Output to Validate:
+"""
+<PASTE THE AI’S ENTIRE PRIOR RESPONSE INCLUDING JSON_HEADER AND PREVIEWS>
+"""
+
+Your Task:
+1) Perform the Aegis Test (three passes):
+   - Engineer’s Critique: Syntax, efficiency, error handling, logic.
+   - Architect’s Critique: Design fitness, scalability, maintainability, anti‑patterns.
+   - User’s Critique: Does it fulfill the mission perfectly? Clarity and usability.
+2) Announce flaws found in each test and how you will fix them.
+3) Generate the final, corrected deliverables as a NEW YAFA‑MS response containing JSON_HEADER and the ready‑to‑use FILE_CONTENT for all artifacts (PREVIEW + FILE_CONTENT per deliverable). If no flaws are found, state that it passed inspection and provide the final files.
+
+Rules
+- PREVIEW must remain prose; FILE_CONTENT carries the exact files.
+- Respect YAFA overlay rules for high‑stakes mode.
+- If any violation persists, withhold FILE_CONTENT for affected artifacts and mark blocked.

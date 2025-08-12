@@ -1,24 +1,43 @@
 {
   "name": "yafa-ms-vnext",
-  "private": true,
   "version": "1.0.0",
-  "description": "YAFA-MS vNext - Mission execution platform",
+  "description": "YAFA-MS - AI Business Assistant Platform",
+  "main": "dist/server/index.js",
   "scripts": {
-    "install": "npm run install:web && npm run install:server",
-    "install:web": "cd web && npm install",
-    "install:server": "cd server && npm install",
-    "dev": "concurrently \"npm run dev:server\" \"npm run dev:web\"",
-    "dev:server": "cd server && npm run dev",
-    "dev:web": "cd web && npm run dev",
-    "build": "npm run build:web && npm run build:server",
-    "build:web": "cd web && npm run build",
-    "build:server": "cd server && npm run build",
-    "test": "cd scripts && bash smoke-test.sh",
-    "docker:build": "docker-compose build",
-    "docker:up": "docker-compose up -d",
-    "docker:down": "docker-compose down"
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:frontend": "cd frontend && vite",
+    "dev:backend": "cd backend && tsx watch src/index.ts",
+    "build": "npm run build:frontend && npm run build:backend",
+    "build:frontend": "cd frontend && vite build",
+    "build:backend": "cd backend && tsc",
+    "start": "node dist/server/index.js",
+    "test": "vitest",
+    "lint": "eslint . --ext .ts,.tsx",
+    "type-check": "tsc --noEmit",
+    "setup": "npm install && npm run setup:dirs",
+    "setup:dirs": "mkdir -p data/bundles data/files backend/src frontend/src"
+  },
+  "keywords": ["ai", "business", "automation", "assistant"],
+  "author": "YAFA-MS Team",
+  "license": "MIT",
+  "dependencies": {
+    "@fastify/cors": "^9.0.1",
+    "fastify": "^4.24.3",
+    "sqlite3": "^5.1.6",
+    "uuid": "^9.0.1",
+    "archiver": "^6.0.1",
+    "tsx": "^4.6.0"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2"
-  }
+    "@types/node": "^20.10.0",
+    "@types/uuid": "^9.0.7",
+    "@types/archiver": "^6.0.2",
+    "typescript": "^5.3.2",
+    "concurrently": "^8.2.2",
+    "vitest": "^1.0.4",
+    "eslint": "^8.55.0",
+    "@typescript-eslint/eslint-plugin": "^6.13.1",
+    "@typescript-eslint/parser": "^6.13.1"
+  },
+  "workspaces": ["frontend", "backend"]
 }
