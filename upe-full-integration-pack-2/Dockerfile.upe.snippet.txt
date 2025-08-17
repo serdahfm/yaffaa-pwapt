@@ -1,0 +1,11 @@
+
+# In your Dockerfile, after copying requirements.txt:
+# COPY requirements.txt .
+# RUN python -m pip install -r requirements.txt
+# Add:
+COPY requirements.upe.txt ./requirements.upe.txt
+RUN python -m pip install -r requirements.upe.txt
+
+# Ensure storage directory is present
+ENV YAFA_STORAGE_DIR=/app/data/upe
+RUN mkdir -p /app/data/upe && chown -R appuser /app/data
