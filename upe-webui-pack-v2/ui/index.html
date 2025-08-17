@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>UPE — One Box Interface</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <header>
+    <h1>Universal Prompt Engine</h1>
+    <div class="subtitle">One box in → artifact + engineered prompt out</div>
+  </header>
+
+  <main>
+    <section class="panel">
+      <h2>Task</h2>
+      <textarea id="goal" placeholder="Describe your task... e.g., 'Write a 2‑page report on warehouse throughput'"></textarea>
+
+      <div class="row">
+        <div class="col">
+          <label>Explore</label>
+          <div class="pills" id="explore">
+            <button data-explore="MS" class="pill active">MS</button>
+            <button data-explore="YAFA" class="pill">YAFA</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col">
+          <label>Gear</label>
+          <div class="pills" id="gear">
+            <button data-gear="turbo" class="pill active">Turbo</button>
+            <button data-gear="mentor" class="pill">Mentor</button>
+            <button data-gear="proof" class="pill">Proof</button>
+          </div>
+        </div>
+        <div class="col">
+          <label>Format</label>
+          <div class="pills" id="format">
+            <button data-format="md" class="pill active">Markdown</button>
+            <button data-format="docx" class="pill">DOCX</button>
+            <button data-format="pdf" class="pill">PDF</button>
+            <button data-format="pptx" class="pill">PPTX</button>
+            <button data-format="xlsx" class="pill">XLSX</button>
+            <button data-format="html" class="pill">HTML</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col">
+          <label>Audience</label>
+          <input id="audience" placeholder="e.g., Ops, Board, Students">
+        </div>
+        <div class="col">
+          <label>Timeframe</label>
+          <input id="timeframe" placeholder="e.g., 2025-Q3">
+        </div>
+        <div class="col">
+          <label>Tone</label>
+          <input id="tone" placeholder="e.g., executive, friendly, technical">
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col">
+          <label>Seed (optional)</label>
+          <input id="seed" type="number" placeholder="e.g., 42">
+        </div>
+        <div class="col secondaries">
+          <label>Also export</label>
+          <label><input type="checkbox" value="pdf" class="sec"> PDF</label>
+          <label><input type="checkbox" value="docx" class="sec"> DOCX</label>
+          <label><input type="checkbox" value="xlsx" class="sec"> XLSX</label>
+          <label><input type="checkbox" value="html" class="sec"> HTML</label>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button id="runBtn" class="primary">Run</button>
+        <span id="status"></span>
+      </div>
+    </section>
+
+    <section id="result" class="panel hidden">
+      <h2>Result</h2>
+      <div class="meta">
+        <div><b>Status:</b> <span id="resStatus"></span></div>
+        <div><b>Manifest ID:</b> <span id="manifestId"></span></div>
+        <div><b>Model:</b> <span id="resModel"></span> • <b>Seed:</b> <span id="resSeed"></span></div>
+      </div>
+
+      <div id="downloads" class="downloads"></div>
+
+      <details id="promptBlock">
+        <summary>Engineered Prompt (used)</summary>
+        <pre id="engineeredPrompt"></pre>
+      </details>
+
+      <details id="downstreamBlock">
+        <summary>Downstream Prompt Enforcer (copy for ChatGPT/Claude)</summary>
+        <pre id="downstreamPrompt"></pre>
+      </details>
+
+      <h3>Follow-Up Suggestions</h3>
+      <div id="followups" class="followups"></div>
+
+      <h3>SABI Repair</h3>
+      <textarea id="sabiText" placeholder="Describe edits: remove section X, focus on Y, limit summary to 120 words"></textarea>
+      <div class="actions">
+        <button id="applySabi" class="secondary">Apply Edits</button>
+      </div>
+
+      <details class="tools">
+        <summary>More tools (converter, debug)</summary>
+        <div id="converter">
+          <label>Convert this run to additional formats (adds files beside the original):</label>
+          <div class="pills" id="convertPills">
+            <button data-t="md" class="pill">MD</button>
+            <button data-t="docx" class="pill">DOCX</button>
+            <button data-t="pdf" class="pill">PDF</button>
+            <button data-t="pptx" class="pill">PPTX</button>
+            <button data-t="xlsx" class="pill">XLSX</button>
+            <button data-t="html" class="pill">HTML</button>
+          </div>
+        </div>
+      </details>
+    </section>
+  </main>
+
+  <footer>
+    <a href="#" id="openUiRoot">Open UI Root</a>
+  </footer>
+
+  <script src="./app.js"></script>
+</body>
+</html>

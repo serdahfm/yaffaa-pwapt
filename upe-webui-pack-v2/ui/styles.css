@@ -1,0 +1,32 @@
+
+* { box-sizing: border-box; }
+body { font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial; margin: 0; color: #0f172a; background: #f8fafc; }
+header { padding: 20px 24px; background: #0f172a; color: white; }
+h1 { margin: 0 0 4px; font-size: 22px; }
+.subtitle { opacity: .8; font-size: 14px; }
+main { max-width: 1000px; margin: 24px auto; padding: 0 16px; }
+.panel { background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin-bottom: 16px; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
+.row { display: flex; gap: 12px; margin-top: 12px; }
+.col { flex: 1; }
+label { display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px; color: #334155; }
+textarea#goal { width: 100%; min-height: 110px; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px; font-size: 14px; }
+input { width: 100%; border: 1px solid #cbd5e1; border-radius: 8px; padding: 8px; font-size: 14px; }
+.pills { display: flex; flex-wrap: wrap; gap: 8px; }
+.pill { border: 1px solid #cbd5e1; background: #f1f5f9; color: #0f172a; border-radius: 999px; padding: 6px 12px; cursor: pointer; font-size: 13px; }
+.pill.active { background: #0ea5e9; border-color: #0284c7; color: white; }
+.actions { margin-top: 14px; display: flex; align-items: center; gap: 10px; }
+.primary { background: #0ea5e9; color: white; border: none; border-radius: 8px; padding: 10px 14px; font-weight: 600; cursor: pointer; }
+.secondary { background: #e2e8f0; color: #0f172a; border: none; border-radius: 8px; padding: 8px 12px; cursor: pointer; }
+#status { color: #334155; font-size: 13px; }
+.hidden { display: none; }
+.meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 6px; margin-bottom: 8px; }
+.downloads { display: flex; flex-wrap: wrap; gap: 10px; margin: 8px 0 16px; }
+.downloads a { text-decoration: none; background: #16a34a; color: white; padding: 8px 12px; border-radius: 8px; font-size: 13px; }
+.followups { display: grid; gap: 8px; }
+.followups .card { border: 1px dashed #cbd5e1; border-radius: 10px; padding: 10px; }
+.followups .card h4 { margin: 0 0 4px; font-size: 14px; }
+.followups .card .desc { opacity: .8; font-size: 12px; margin-bottom: 6px; }
+.followups .card .row { margin: 4px 0; }
+#engineeredPrompt { white-space: pre-wrap; background: #0b1220; color: #e2e8f0; padding: 12px; border-radius: 8px; font-size: 12px; overflow: auto; }
+#downstreamPrompt { white-space: pre-wrap; background: #0b1220; color: #e2e8f0; padding: 12px; border-radius: 8px; font-size: 12px; overflow: auto; }
+.tools summary { cursor: pointer; font-weight: 600; }
