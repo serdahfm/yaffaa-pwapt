@@ -1,0 +1,31 @@
+
+### UPE Health
+GET http://localhost:8000/upe/health
+
+### Compile mentor (md + pdf,docx)
+POST http://localhost:8000/upe/compile
+Content-Type: application/json
+
+{
+  "v": "1.0.0",
+  "goal": "REST: generate a short report about the UPE system",
+  "yafaOn": true,
+  "mode": "mentor",
+  "seed": 42,
+  "artifact": { "primary": "md", "secondaries": ["pdf", "docx"] },
+  "slots": { "audience": "QA", "timeframe": "2025-Q3", "tone": "neutral", "explore": "MS" }
+}
+
+### Compile proof (docx + pdf)
+POST http://localhost:8000/upe/compile
+Content-Type: application/json
+
+{
+  "v": "1.0.0",
+  "goal": "REST: executive summary with citations",
+  "yafaOn": true,
+  "mode": "proof",
+  "seed": 43,
+  "artifact": { "primary": "docx", "secondaries": ["pdf"] },
+  "slots": { "audience": "Leadership", "timeframe": "2025-Q3", "tone": "executive", "explore": "YAFA" }
+}
