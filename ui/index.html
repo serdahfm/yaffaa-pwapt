@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UPE — Universal Prompt Engine</title>
+    <link rel="stylesheet" href="./styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1 class="logo">UPE</h1>
+                <p class="tagline">Universal Prompt Engine</p>
+            </div>
+            <div class="status-indicator">
+                <span class="status-dot" id="statusDot"></span>
+                <span class="status-text" id="statusText">Checking...</span>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Compile Section -->
+            <section class="compile-section">
+                <h2>Generate Document</h2>
+                <form id="compileForm" class="compile-form">
+                    <div class="form-group">
+                        <label for="goal">Goal</label>
+                        <textarea id="goal" name="goal" placeholder="Describe what you want to generate..." required></textarea>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="mode">Mode</label>
+                            <select id="mode" name="mode" required>
+                                <option value="mentor">Mentor</option>
+                                <option value="proof">Proof</option>
+                                <option value="explore">Explore</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="primary">Primary Format</label>
+                            <select id="primary" name="primary" required>
+                                <option value="md">Markdown</option>
+                                <option value="docx">Word Document</option>
+                                <option value="pptx">PowerPoint</option>
+                                <option value="pdf">PDF</option>
+                                <option value="html">HTML</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="audience">Audience</label>
+                            <input type="text" id="audience" name="audience" placeholder="e.g., Executives, Developers" value="General">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="tone">Tone</label>
+                            <select id="tone" name="tone">
+                                <option value="professional">Professional</option>
+                                <option value="casual">Casual</option>
+                                <option value="technical">Technical</option>
+                                <option value="executive">Executive</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="secondaries">Secondary Formats (optional)</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox">
+                                <input type="checkbox" name="secondaries" value="pdf">
+                                <span>PDF</span>
+                            </label>
+                            <label class="checkbox">
+                                <input type="checkbox" name="secondaries" value="docx">
+                                <span>Word</span>
+                            </label>
+                            <label class="checkbox">
+                                <input type="checkbox" name="secondaries" value="pptx">
+                                <span>PowerPoint</span>
+                            </label>
+                            <label class="checkbox">
+                                <input type="checkbox" name="secondaries" value="html">
+                                <span>HTML</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn-primary" id="compileBtn">
+                        <span class="btn-text">Generate Document</span>
+                        <span class="btn-loading" style="display: none;">Generating...</span>
+                    </button>
+                </form>
+            </section>
+
+            <!-- Results Section -->
+            <section class="results-section" id="resultsSection" style="display: none;">
+                <h2>Generated Results</h2>
+                <div class="result-content">
+                    <div class="result-info">
+                        <h3 id="resultTitle">Document Title</h3>
+                        <p id="resultStatus">Status: Processing...</p>
+                    </div>
+                    
+                    <div class="artifact-links" id="artifactLinks">
+                        <!-- Artifact download links will be populated here -->
+                    </div>
+                    
+                    <div class="result-actions">
+                        <button class="btn-secondary" id="downloadAllBtn">Download All</button>
+                        <button class="btn-secondary" id="viewManifestBtn">View Manifest</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Follow-up Suggestions -->
+            <section class="followup-section" id="followupSection" style="display: none;">
+                <h2>Follow-up Suggestions</h2>
+                <div class="suggestions-grid" id="suggestionsGrid">
+                    <!-- Follow-up suggestions will be populated here -->
+                </div>
+            </section>
+
+            <!-- SABI Feedback Section -->
+            <section class="feedback-section" id="feedbackSection" style="display: none;">
+                <h2>SABI Surgical Editing</h2>
+                <form id="feedbackForm" class="feedback-form">
+                    <div class="form-group">
+                        <label for="editOperation">Edit Operation</label>
+                        <select id="editOperation" name="editOperation" required>
+                            <option value="limit">Limit Section</option>
+                            <option value="rewrite">Rewrite Section</option>
+                            <option value="add">Add Content</option>
+                            <option value="remove">Remove Content</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="targetSection">Target Section</label>
+                        <input type="text" id="targetSection" name="targetSection" placeholder="e.g., Executive Summary" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="editDetails">Edit Details</label>
+                        <textarea id="editDetails" name="editDetails" placeholder="Describe the specific changes..." required></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn-primary">Apply Edit</button>
+                </form>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>&copy; 2024 UPE System. Powered by OpenAI GPT-4.</p>
+        </footer>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <p>Processing your request...</p>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="./app.js"></script>
+</body>
+</html>
