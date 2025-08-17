@@ -1,0 +1,14 @@
+{
+  "name": "@yafa/web",
+  "version": "1.0.0",
+  "description": "YAFFA Engine v2.0 Web Interface - DOMAIN EMPIRE Frontend",
+  "scripts": {
+    "build": "cp -r src/* dist/",
+    "dev": "echo 'Web app ready - open dist/index.html in browser'",
+    "clean": "rm -rf dist",
+    "serve": "python3 -m http.server 3000 --directory dist"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  }
+}

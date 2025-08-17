@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YAFFA Engine v2.0 - DOMAIN EMPIRE</title>
+    <meta name="description" content="The Ultimate Domain-Aware Prompt Engineering Platform">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Framer Motion (for animations) -->
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    
+    <!-- Custom Styles -->
+    <style>
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1f2937;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4b5563;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6b7280;
+        }
+        
+        /* Smooth transitions */
+        .transition-all {
+            transition: all 0.2s ease-in-out;
+        }
+        
+        /* YAFFA mode accent colors */
+        .yaffa-mode {
+            --accent-color: #dc2626;
+            --accent-light: #fca5a5;
+        }
+        
+        .discovery-mode {
+            --accent-color: #d97706;
+            --accent-light: #fed7aa;
+        }
+        
+        /* Loading animation */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .animate-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+    </style>
+</head>
+<body class="bg-neutral-950 text-neutral-100 min-h-screen">
+    <!-- 🚀 MAIN CONTAINER -->
+    <div id="app" class="min-h-screen">
+        <!-- 🎯 HEADER -->
+        <header class="border-b border-neutral-800 bg-neutral-900/50 backdrop-blur-sm sticky top-0 z-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-16">
+                    <!-- Logo & Title -->
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-gradient-to-br from-red-500 to-pink-600 rounded-lg flex items-center justify-center">
+                            <span class="text-white font-bold text-sm">Y</span>
+                        </div>
+                        <h1 class="text-xl font-bold bg-gradient-to-r from-white to-neutral-300 bg-clip-text text-transparent">
+                            YAFFA Engine v2.0
+                        </h1>
+                        <span class="text-xs bg-neutral-800 text-neutral-400 px-2 py-1 rounded-full">
+                            DOMAIN EMPIRE
+                        </span>
+                    </div>
+                    
+                    <!-- Mode Toggle -->
+                    <div class="flex items-center space-x-2">
+                        <button id="discoveryMode" class="px-3 py-1.5 rounded-lg bg-neutral-800 hover:bg-amber-600/20 text-neutral-300 hover:text-amber-400 transition-all">
+                            Discovery Mode
+                        </button>
+                        <button id="yaffaMode" class="px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white transition-all">
+                            YAFFA Mode
+                        </button>
+                    </div>
+                    
+                    <!-- Status Indicator -->
+                    <div class="flex items-center space-x-2">
+                        <div id="statusIndicator" class="w-2 h-2 bg-green-500 rounded-full"></div>
+                        <span id="statusText" class="text-sm text-neutral-400">Ready</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- 🎯 MAIN CONTENT -->
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                
+                <!-- 🎯 LEFT COLUMN: MAIN COMPOSER -->
+                <div class="lg:col-span-2 space-y-6">
+                    
+                    <!-- Domain Detection Badge -->
+                    <div id="domainBadge" class="hidden">
+                        <div class="bg-neutral-900 border border-neutral-700 rounded-lg p-4">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                                <span class="text-sm text-neutral-300">Detecting domain...</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Main Input Area -->
+                    <div class="bg-neutral-900 border border-neutral-700 rounded-lg p-6">
+                        <label for="goalInput" class="block text-sm font-medium text-neutral-300 mb-3">
+                            What would you like me to help you create?
+                        </label>
+                        <textarea
+                            id="goalInput"
+                            rows="6"
+                            class="w-full bg-neutral-800 border border-neutral-600 rounded-lg p-4 text-white placeholder-neutral-400 focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all resize-none"
+                            placeholder="Describe your goal in detail... (e.g., 'Create a 10-slide executive presentation for a Q4 board meeting about our new AI product launch')"
+                        ></textarea>
+                        
+                        <!-- Generate Button -->
+                        <div class="mt-4 flex items-center space-x-3">
+                            <button id="generateBtn" class="px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-all flex items-center space-x-2">
+                                <span id="generateBtnText">Generate Master Prompt</span>
+                                <div id="generateSpinner" class="hidden w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                            </button>
+                            
+                            <!-- Domain Info -->
+                            <div id="domainInfo" class="hidden text-sm text-neutral-400">
+                                <span id="domainName"></span> • 
+                                <span id="domainConfidence"></span>% confidence
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Final Prompt Display -->
+                    <div id="finalPromptSection" class="hidden">
+                        <div class="bg-neutral-900 border border-neutral-700 rounded-lg p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-lg font-medium text-white">🎯 Final Prompt</h3>
+                                <div class="flex items-center space-x-2">
+                                    <span id="optimizationBadge" class="text-xs bg-green-600 text-white px-2 py-1 rounded-full">
+                                        Optimized ✓
+                                    </span>
+                                    <button id="copyPromptBtn" class="px-3 py-1 bg-neutral-700 hover:bg-neutral-600 text-white text-sm rounded transition-all">
+                                        Copy
+                                    </button>
+                                    <button id="improveBtn" class="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded transition-all">
+                                        Improve
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div id="promptText" class="bg-neutral-800 border border-neutral-600 rounded-lg p-4 text-sm text-neutral-200 font-mono whitespace-pre-wrap max-h-96 overflow-y-auto"></div>
+                            
+                            <!-- Builder Plan Section -->
+                            <div id="builderPlanSection" class="hidden mt-4">
+                                <div class="border-t border-neutral-700 pt-4">
+                                    <h4 class="text-sm font-medium text-neutral-300 mb-2">🏗️ File Builder Plan</h4>
+                                    <div class="flex items-center space-x-2">
+                                        <button id="copyBuilderBtn" class="px-3 py-1 bg-green-600 hover:bg-green-700 text-white text-sm rounded transition-all">
+                                            Copy for Builder
+                                        </button>
+                                        <span class="text-xs text-neutral-400" id="copyInstruction"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Alternatives Section -->
+                    <div id="alternativesSection" class="hidden">
+                        <div class="bg-neutral-900 border border-neutral-700 rounded-lg p-6">
+                            <h3 class="text-lg font-medium text-white mb-4">🔄 Alternative Approaches</h3>
+                            <div id="alternativesList" class="space-y-3"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 🎯 RIGHT COLUMN: SABI LOOP & FILE BUILDER -->
+                <div class="space-y-6">
+                    
+                    <!-- SABI Loop Panel -->
+                    <div class="bg-neutral-900 border border-neutral-700 rounded-lg p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-medium text-white">🔄 SABI Loop</h3>
+                            <button id="clearSabiBtn" class="text-xs text-neutral-400 hover:text-white transition-all">
+                                Clear
+                            </button>
+                        </div>
+                        
+                        <!-- Original Prompt -->
+                        <div id="originalPromptSection" class="hidden mb-4 p-3 bg-neutral-800 rounded border border-neutral-600">
+                            <h4 class="text-sm font-medium text-neutral-300 mb-2">Original Prompt</h4>
+                            <div id="originalPromptText" class="text-xs text-neutral-400"></div>
+                        </div>
+                        
+                        <!-- SABI Steps -->
+                        <div id="sabiSteps" class="space-y-3"></div>
+                        
+                        <!-- Add SABI Step -->
+                        <div id="addSabiSection" class="hidden mt-4 p-3 bg-neutral-800 rounded border border-neutral-600">
+                            <h4 class="text-sm font-medium text-neutral-300 mb-2">Add SABI Step</h4>
+                            <textarea
+                                id="llmResponseInput"
+                                rows="3"
+                                class="w-full bg-neutral-700 border border-neutral-600 rounded p-2 text-white text-xs placeholder-neutral-400 resize-none"
+                                placeholder="Paste the LLM response here..."
+                            ></textarea>
+                            <input
+                                id="userFeedbackInput"
+                                type="text"
+                                class="w-full mt-2 bg-neutral-700 border border-neutral-600 rounded p-2 text-white text-xs placeholder-neutral-400"
+                                placeholder="What do you want changed/accomplished?"
+                            />
+                            <button id="addSabiBtn" class="w-full mt-2 px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded transition-all">
+                                Add Step
+                            </button>
+                        </div>
+                        
+                        <!-- Generate Fresh Button -->
+                        <button id="generateFreshBtn" class="w-full mt-4 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg transition-all hidden">
+                            Generate Fresh Prompt
+                        </button>
+                    </div>
+                    
+                    <!-- File Builder Panel -->
+                    <div id="fileBuilderPanel" class="hidden bg-neutral-900 border border-neutral-700 rounded-lg p-6">
+                        <h3 class="text-lg font-medium text-white mb-4">🏗️ File Builder</h3>
+                        
+                        <div class="space-y-3">
+                            <textarea
+                                id="builderPlanInput"
+                                rows="6"
+                                class="w-full bg-neutral-800 border border-neutral-600 rounded-lg p-3 text-white text-sm placeholder-neutral-400 resize-none font-mono"
+                                placeholder="Paste the builder_plan JSON here..."
+                            ></textarea>
+                            
+                            <div class="flex space-x-2">
+                                <button id="buildBtn" class="flex-1 px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-all">
+                                    Build
+                                </button>
+                                <button id="showCliBtn" class="px-4 py-2 bg-neutral-700 hover:bg-neutral-600 text-white text-sm rounded-lg transition-all">
+                                    CLI
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Domain Packs Info -->
+                    <div class="bg-neutral-900 border border-neutral-700 rounded-lg p-6">
+                        <h3 class="text-lg font-medium text-white mb-4">🎯 Domain Packs</h3>
+                        <div id="domainPacksInfo" class="text-sm text-neutral-400">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+                                <span>Loading domain packs...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 🚀 IMPROVE POPOVER -->
+    <div id="improvePopover" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+        <div class="bg-neutral-900 border border-neutral-700 rounded-lg p-6 max-w-md w-full mx-4">
+            <h3 class="text-lg font-medium text-white mb-4">🔧 Improve Prompt</h3>
+            <div id="knobSuggestions" class="space-y-3 mb-4"></div>
+            <div class="flex space-x-2">
+                <button id="applyImprovementsBtn" class="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-all">
+                    Apply & Regenerate
+                </button>
+                <button id="cancelImproveBtn" class="px-4 py-2 bg-neutral-700 hover:bg-neutral-600 text-white font-medium rounded-lg transition-all">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🚀 TOAST NOTIFICATIONS -->
+    <div id="toastContainer" class="fixed top-4 right-4 z-50 space-y-2"></div>
+
+    <!-- 🚀 JAVASCRIPT -->
+    <script type="module" src="./main.js"></script>
+</body>
+</html>

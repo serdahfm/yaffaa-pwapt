@@ -1,0 +1,19 @@
+{
+  "name": "@yafa/domain-packs",
+  "version": "1.0.0",
+  "description": "Massive domain library for YAFFA Engine - 100+ domain packs covering every industry",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3",
+    "@types/node": "^20.10.0"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "name": "@yafa/compiler",
+  "version": "1.0.0",
+  "description": "Core YAFFA Engine compiler implementing the Compile → Evaluate → Patch → Final pipeline",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "zod": "^3.22.4",
+    "@yafa/domain-packs": "file:../domain-packs"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3",
+    "@types/node": "^20.10.0"
+  }
+}
