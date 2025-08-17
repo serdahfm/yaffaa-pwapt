@@ -1,6 +1,0 @@
-
-# Add these to your requirements.txt
-python-pptx==0.6.23
-python-docx==1.1.2
-openpyxl==3.1.5
-reportlab==4.2.2
