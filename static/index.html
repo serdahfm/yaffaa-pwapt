@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prompt Engineer - Universal Prompt Engineering Tool</title>
+    <link rel="stylesheet" href="./styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Main Prompt Engineering Area (Left) -->
+        <div class="main-area">
+            <!-- Header -->
+            <div class="header">
+                <div class="logo">
+                    <span class="logo-text">Prompt Engineer</span>
+                    <span class="logo-subtitle">Universal Prompt Engineering Tool</span>
+                </div>
+                <div class="mode-selector">
+                    <button class="mode-btn active" data-mode="default">Default</button>
+                    <button class="mode-btn" data-mode="yafa">YAFA</button>
+                    <button class="mode-btn" data-mode="ms">MS</button>
+                </div>
+            </div>
+
+            <!-- Main Chat Area -->
+            <div class="chat-container">
+                <div class="welcome-message">
+                    <h1>How can I help you today?</h1>
+                    <p>Type your prompt below and I'll transform it into an engineered, copy-paste ready prompt for any AI platform.</p>
+                </div>
+                
+                <div id="chat-messages"></div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="input-container">
+                <div class="input-wrapper">
+                    <textarea 
+                        id="prompt-input" 
+                        placeholder="Type your prompt here..."
+                        rows="3"
+                    ></textarea>
+                    <button id="send-btn" class="send-button">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="input-footer">
+                    <span class="mode-indicator">Mode: <span id="current-mode">Default</span></span>
+                    <span class="context-toggle" id="context-toggle">+ Add Context</span>
+                </div>
+                
+                <!-- Context Input (Hidden by default) -->
+                <div id="context-input" class="context-input hidden">
+                    <textarea 
+                        id="context-text" 
+                        placeholder="Add any relevant context, constraints, or specific requirements..."
+                        rows="2"
+                    ></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- SABI Feedback Loop Area (Right) -->
+        <div class="sabi-area">
+            <div class="sabi-header">
+                <h3>SABI Feedback Loop</h3>
+                <p>Systematic AI Brainstorming Iteration</p>
+            </div>
+            
+            <div class="sabi-container">
+                <div class="sabi-step">
+                    <h4>Original Prompt</h4>
+                    <textarea id="original-prompt" placeholder="Paste your original prompt here..." rows="3"></textarea>
+                </div>
+                
+                <div class="sabi-step">
+                    <h4>AI Response</h4>
+                    <textarea id="ai-response" placeholder="Paste the AI's response here..." rows="4"></textarea>
+                </div>
+                
+                <div class="sabi-step">
+                    <h4>Your Feedback</h4>
+                    <textarea id="user-feedback" placeholder="What do you want to achieve with this follow-up?" rows="3"></textarea>
+                </div>
+                
+                <button id="sabi-generate" class="sabi-btn">Generate Follow-up Prompt</button>
+                
+                <div id="sabi-results" class="sabi-results hidden">
+                    <h4>Follow-up Prompt</h4>
+                    <div class="result-content">
+                        <div id="follow-up-prompt" class="prompt-output"></div>
+                        <div class="score-display">
+                            <span class="score-label">Score:</span>
+                            <span id="sabi-score" class="score-value">0</span>/100
+                        </div>
+                        <div id="sabi-suggestions" class="suggestions"></div>
+                    </div>
+                    
+                    <!-- Iteration Controls -->
+                    <div class="iteration-controls">
+                        <button id="add-iteration" class="iteration-btn">+ Add Another Iteration</button>
+                        <button id="clear-sabi" class="clear-btn">Clear All</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay hidden">
+        <div class="loading-spinner"></div>
+        <p>Engineering your prompt...</p>
+    </div>
+
+    <!-- Score Display Modal -->
+    <div id="score-modal" class="score-modal hidden">
+        <div class="score-content">
+            <div class="score-header">
+                <h3>Prompt Score</h3>
+                <button class="close-btn" id="close-score">×</button>
+            </div>
+            <div class="score-display-large">
+                <span id="modal-score" class="score-number">0</span>
+                <span class="score-max">/100</span>
+            </div>
+            <div id="modal-suggestions" class="modal-suggestions"></div>
+            <div id="modal-guarantees" class="modal-guarantees"></div>
+        </div>
+    </div>
+
+    <script src="./app.js"></script>
+</body>
+</html>
