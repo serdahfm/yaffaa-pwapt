@@ -1,0 +1,1 @@
+# YAFA Prompts Project Structure

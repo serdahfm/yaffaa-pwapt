@@ -1,0 +1,19 @@
+{
+  "name": "@yafa/compiler",
+  "version": "1.0.0",
+  "description": "Multi-stage prompt compiler for YAFA Engine",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@yafa/types": "*",
+    "openai": "^4.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

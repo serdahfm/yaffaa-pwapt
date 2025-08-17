@@ -1,0 +1,77 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: yafa-postgres
+    environment:
+      POSTGRES_USER: yafa
+      POSTGRES_PASSWORD: yafa
+      POSTGRES_DB: yafa
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U yafa"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: yafa-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  minio:
+    image: quay.io/minio/minio:RELEASE.2024-08-03T04-33-23Z
+    container_name: yafa-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: yafa
+      MINIO_ROOT_PASSWORD: yafa12345
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  # Optional: Database admin interface
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: yafa-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@yafa.local
+      PGADMIN_DEFAULT_PASSWORD: yafa
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    profiles:
+      - admin
+
+volumes:
+  pgdata:
+    driver: local
+  redisdata:
+    driver: local
+  minio:
+    driver: local
+
+networks:
+  default:
+    name: yafa-network

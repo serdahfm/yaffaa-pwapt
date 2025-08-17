@@ -1,0 +1,128 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Run {
+  id              String   @id @default(cuid())
+  mode            String   // 'yaffa' | 'discovery'
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  promptContract  Json
+  artifactPlan    Json?
+  determinism     Float?
+  status          String   @default("queued") // 'queued' | 'running' | 'succeeded' | 'failed'
+  message         String?  // error or status detail
+  jobId           String?  // BullMQ job ID
+  userId          String?  // for future user tracking
+  artifacts       Artifact[]
+  probeResults    ProbeResult[]
+
+  @@index([status])
+  @@index([createdAt])
+  @@index([mode])
+}
+
+model Artifact {
+  id          String   @id @default(cuid())
+  runId       String
+  type        String   // 'pptx' | 'xlsx' | 'docx' | 'pdf' | 'zip'
+  filename    String
+  s3Key       String
+  contentType String?
+  size        Int?     // file size in bytes
+  createdAt   DateTime @default(now())
+  downloadUrl String?  // presigned URL cache
+  Run         Run      @relation(fields: [runId], references: [id], onDelete: Cascade)
+
+  @@index([runId])
+  @@index([type])
+}
+
+model GoldenPrompt {
+  id          String   @id @default(cuid())
+  domain      String
+  name        String
+  contract    Json
+  expected    Json?
+  description String?
+  tags        String[] @default([])
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([domain, name])
+  @@index([domain])
+  @@index([active])
+}
+
+model ProbeResult {
+  id                String   @id @default(cuid())
+  runId             String
+  probeType         String   // 'determinism' | 'compliance' | 'quality'
+  score             Float
+  details           Json?
+  metadata          Json?
+  createdAt         DateTime @default(now())
+  Run               Run      @relation(fields: [runId], references: [id], onDelete: Cascade)
+
+  @@index([runId])
+  @@index([probeType])
+  @@index([score])
+}
+
+model JobQueue {
+  id          String   @id @default(cuid())
+  jobId       String   @unique // BullMQ job ID
+  name        String   // job name/type
+  data        Json
+  priority    Int      @default(0)
+  attempts    Int      @default(0)
+  maxAttempts Int      @default(3)
+  status      String   @default("waiting") // 'waiting' | 'active' | 'completed' | 'failed' | 'delayed'
+  processedAt DateTime?
+  finishedAt  DateTime?
+  failedReason String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([status])
+  @@index([name])
+  @@index([createdAt])
+}
+
+model Cartridge {
+  id           String   @id @default(cuid())
+  domain       String   @unique
+  name         String
+  description  String?
+  config       Json     // YAML-like configuration
+  exemplars    Json[]   @default([])
+  glossary     Json[]   @default([])
+  active       Boolean  @default(true)
+  version      String   @default("1.0.0")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([domain])
+  @@index([active])
+}
+
+model TelemetryEvent {
+  id          String   @id @default(cuid())
+  eventType   String
+  userId      String?
+  sessionId   String?
+  properties  Json?
+  timestamp   DateTime @default(now())
+  source      String?  // 'web' | 'api' | 'cli'
+
+  @@index([eventType])
+  @@index([timestamp])
+  @@index([userId])
+}
